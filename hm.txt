@@ -1,0 +1,102 @@
+import speech_recognition as sr
+import pyttsx3
+import datetime
+import wikipedia
+import pywhatkit
+import webbrowser
+import pyjokes
+
+engine = pyttsx3.init()
+engine.setProperty('rate', 170)
+
+def speak(text):
+    print("Assistant:", text)
+    engine.say(text)
+    engine.runAndWait()
+
+def take_command():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.adjust_for_ambient_noise(source)
+        audio = r.listen(source)
+
+    try:
+        command = r.recognize_google(audio)
+        command = command.lower()
+        print("You said:", command)
+        return command
+    except:
+        speak("Sorry, I did not understand")
+        return ""
+
+def run_assistant():
+    speak("Hello, I am your smart Python voice assistant")
+
+    while True:
+        command = take_command()
+
+        # TIME
+        if "time" in command:
+            time = datetime.datetime.now().strftime('%I:%M %p')
+            speak("The current time is " + time)
+
+        # DATE
+        elif "date" in command:
+            date = datetime.datetime.now().strftime('%d %B %Y')
+            speak("Today's date is " + date)
+
+        # WIKIPEDIA SEARCH
+        elif "wikipedia" in command:
+            speak("Searching Wikipedia")
+            query = command.replace("wikipedia", "")
+            result = wikipedia.summary(query, sentences=2)
+            speak(result)
+
+        # GOOGLE SEARCH
+        elif "search" in command:
+            query = command.replace("search", "")
+            speak("Searching Google for " + query)
+            pywhatkit.search(query)
+
+        # YOUTUBE PLAY
+        elif "play" in command:
+            song = command.replace("play", "")
+            speak("Playing " + song)
+            pywhatkit.playonyt(song)
+
+        # OPEN WEBSITES
+        elif "open google" in command:
+            speak("Opening Google")
+            webbrowser.open("https://www.google.com")
+
+        elif "open youtube" in command:
+            speak("Opening YouTube")
+            webbrowser.open("https://www.youtube.com")
+
+        elif "open gmail" in command:
+            speak("Opening Gmail")
+            webbrowser.open("https://mail.google.com")
+
+        elif "open linkedin" in command:
+            speak("Opening LinkedIn")
+            webbrowser.open("https://www.linkedin.com")
+
+        elif "open github" in command:
+            speak("Opening GitHub")
+            webbrowser.open("https://github.com")
+
+        # JOKE
+        elif "joke" in command:
+            joke = pyjokes.get_joke()
+            speak(joke)
+
+        # EXIT
+        elif "exit" in command or "stop" in command or "quit" in command:
+            speak("Goodbye, have a nice day")
+            break
+
+        elif command != "":
+            speak("Command not recognized, please try again")
+
+run_assistant()
